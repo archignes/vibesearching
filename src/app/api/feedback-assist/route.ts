@@ -22,6 +22,9 @@ interface FeedbackAssistRequest {
   selectedIssues: IssueId[];
   userComments: string;
   devMode?: boolean;
+  // Optional display-only fields that might be included
+  selectedIssuesText?: string;
+  previewText?: string;
 }
 
 export async function POST(req: Request) {
@@ -34,7 +37,15 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { inputQuery, targetQuery, selectedIssues, userComments, devMode } = await req.json() as FeedbackAssistRequest;
+    const { 
+      inputQuery, 
+      targetQuery, 
+      selectedIssues, 
+      userComments, 
+      devMode,
+      selectedIssuesText, 
+      previewText 
+    } = await req.json() as FeedbackAssistRequest;
 
     // Return contextual mock data if in dev mode
     if (devMode) {
@@ -60,23 +71,33 @@ export async function POST(req: Request) {
       selectedIssues 
     });
 
-    // Convert issue IDs to labels
-    const issueLabels = selectedIssues.map(id => ISSUE_TYPES[id]?.label || id);
-
-    // Construct user message with all context
-    const userMessage = `
+    // Format the message from either the previewText (if provided) or construct it ourselves
+    let userMessage;
+    
+    if (req.body && previewText) {
+      // Use the preview text from the frontend if available, and append user comments
+      userMessage = `${previewText} ${userComments || "None yet"}
+      
+Please write a detailed and forceful feedback comment from my perspective.`;
+    } else {
+      // Otherwise construct the message from scratch
+      const issueLabels = selectedIssues.map(id => ISSUE_TYPES[id]?.label || id);
+      const issuesText = selectedIssuesText || (issueLabels.length > 0 ? issueLabels.join(", ") : "None selected");
+      
+      userMessage = `
 I need help writing detailed feedback about a search suggestion I didn't find helpful.
 
 Original input query: "${inputQuery}"
 
 Suggested query I didn't like: "${targetQuery}"
 
-Issues I selected: ${issueLabels.length > 0 ? issueLabels.join(", ") : "None selected"}
+Issues I selected: ${issuesText}
 
 My initial comments: ${userComments || "None yet"}
 
-Please help me write a more detailed and specific feedback comment.
+Please write a detailed and forceful feedback comment from my perspective.
 `;
+    }
 
     const groq = new Groq({
       apiKey: process.env.GROQ_API_KEY,
