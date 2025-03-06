@@ -8,8 +8,11 @@ import QueryItem from "./QueryItem";
 import useInputStore from "@/store/useInputStore";
 import useSearchStore from "@/store/useSearchStore";
 import { interestingQueries } from "@/data/interestingQueries";
+import type { VibingAroundYouProps } from "@/types/componentTypes";
 
-export default function VibingAroundYou(): JSX.Element {
+export default function VibingAroundYou({
+  onVibeStart,
+}: VibingAroundYouProps): JSX.Element {
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [shuffledQueries, setShuffledQueries] = useState<
     typeof interestingQueries
@@ -62,7 +65,7 @@ export default function VibingAroundYou(): JSX.Element {
         const estimatedHeight =
           baseQueryHeight +
           query.text.length * heightPerTextLength +
-          (query.source ? 20 : 0);
+          (query.sources.length > 0 ? 20 : 0);
 
         // If adding this query would exceed available height, stop
         if (totalUsedHeight + estimatedHeight > availableHeight) {
@@ -91,18 +94,23 @@ export default function VibingAroundYou(): JSX.Element {
   }, [shuffledQueries]);
 
   // Handle refresh - shuffle again
-  const handleRefresh = () => {
+  const handleRefresh = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the container click handler from firing
     shuffleQueries();
   };
 
   const handleQueryClick = () => {
     setIsAnimating(true);
+    // Notify parent component to show loading screen
+    if (onVibeStart) {
+      onVibeStart();
+    }
   };
 
   return (
     <div
       ref={containerRef}
-      className={`relative mt-6 bg-white dark:bg-gray-800 rounded-lg h-[70vh] overflow-hidden transition-opacity duration-300 ${
+      className={`w-full h-full bg-white dark:bg-gray-800 rounded-lg overflow-hidden transition-opacity duration-300 ${
         isAnimating ? "opacity-0" : "opacity-100"
       }`}
       onClick={handleQueryClick}
@@ -117,7 +125,10 @@ export default function VibingAroundYou(): JSX.Element {
         </button>
       </div>
 
-      <div ref={contentRef} className="px-4 pb-4 space-y-2 overflow-hidden">
+      <div
+        ref={contentRef}
+        className="px-4 pb-4 space-y-2 overflow-hidden h-[calc(100%-60px)]"
+      >
         {visibleQueries.map((query) => (
           <QueryItem
             key={query.text}
@@ -130,7 +141,7 @@ export default function VibingAroundYou(): JSX.Element {
             isDisliked={isDisliked(query.text)}
             onStar={() => toggleStar(query.text)}
             onDislike={(text, note) => toggleDislike(text, note)}
-            sourceInfo={query.source}
+            sourcesInfo={query.sources}
           />
         ))}
       </div>

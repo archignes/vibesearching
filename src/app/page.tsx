@@ -9,7 +9,7 @@ import Settings from "@/components/Settings";
 export default function Home(): JSX.Element {
   return (
     <div className="container mx-auto px-4 flex flex-col min-h-screen">
-      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-20 py-2">
+      <header className="fixed top-0 left-0 right-0 bg-white dark:bg-gray-900 z-100 py-2">
         <div className="container mx-auto px-4 flex justify-between items-center">
           <Logo />
           <Settings />

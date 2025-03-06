@@ -15,9 +15,23 @@ export type VibedQueriesProps = {
 };
 
 /**
+ * Props for the VibingAroundYou component
+ */
+export interface VibingAroundYouProps {
+  onVibeStart?: () => void;
+}
+
+/**
+ * Props for the LoadingVibes component
+ */
+export interface LoadingVibesProps {
+  isVisible: boolean;
+}
+
+/**
  * Props for the QueryItem component
  */
-interface SourceInfo {
+interface sourcesInfo {
   logo?: string;
   text: string;
   url: string;
@@ -33,7 +47,7 @@ export interface QueryItemProps {
   isDisliked?: boolean;
   onStar?: (text: string) => void;
   onDislike: (text: string, note?: string, issues?: string[]) => void;
-  sourceInfo?: SourceInfo;
+  sourcesInfo?: sourcesInfo;
 }
 
 /**

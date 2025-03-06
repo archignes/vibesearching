@@ -18,7 +18,7 @@ export default function VibedQueries({ onSelect }: VibedQueriesProps) {
     : [...vibedQueries].slice(-3).reverse();
 
   return (
-    <div className="relative mt-6 h-[70vh] bg-white dark:bg-gray-800 rounded-lg">
+    <div className="w-full h-full bg-white dark:bg-gray-800 rounded-lg">
       <div className="px-4 pb-4 flex flex-col justify-end h-full overflow-y-auto">
         {vibedQueries.length > 3 && (
           <button
