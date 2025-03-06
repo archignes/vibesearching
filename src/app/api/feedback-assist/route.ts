@@ -1,0 +1,141 @@
+import { logger } from "@/lib/logger";
+import { FEEDBACK_ASSIST_PROMPT } from "@/lib/prompts/feedback-assist";
+import { ISSUE_TYPES, IssueId } from "@/types/feedbackTypes";
+import Groq from "groq-sdk";
+
+export const runtime = "edge";
+
+// Generate a more contextual mock response based on actual input
+const getMockResponse = (inputQuery: string, targetQuery: string, issues: IssueId[]) => {
+  // Convert issue IDs to labels
+  const issueLabels = issues.map(id => ISSUE_TYPES[id]?.label || id);
+  const issuesText = issueLabels.length > 0 ? issueLabels.join(", ") : "relevance";
+  
+  return {
+    assistedFeedback: `This suggested query "${targetQuery}" doesn't help with my original question about "${inputQuery}". It has issues with ${issuesText}. I was hoping for a suggestion that would directly address my specific needs rather than this unhelpful recommendation.`
+  };
+};
+
+interface FeedbackAssistRequest {
+  inputQuery: string;
+  targetQuery: string;
+  selectedIssues: IssueId[];
+  userComments: string;
+  devMode?: boolean;
+}
+
+export async function POST(req: Request) {
+  if (!process.env.GROQ_API_KEY) {
+    logger.error("Missing GROQ_API_KEY");
+    return new Response(
+      JSON.stringify({ error: "Server configuration error" }),
+      { status: 500 }
+    );
+  }
+
+  try {
+    const { inputQuery, targetQuery, selectedIssues, userComments, devMode } = await req.json() as FeedbackAssistRequest;
+
+    // Return contextual mock data if in dev mode
+    if (devMode) {
+      logger.info("Dev mode: returning contextual mock feedback assist response");
+      const mockResponse = getMockResponse(inputQuery, targetQuery, selectedIssues);
+      return new Response(JSON.stringify(mockResponse), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    // Validate required fields
+    if (!inputQuery || !targetQuery) {
+      return new Response(
+        JSON.stringify({ error: "Missing required parameters" }),
+        { status: 400 }
+      );
+    }
+
+    logger.info("Processing feedback assist request", { 
+      inputQuery, 
+      targetQuery, 
+      selectedIssues 
+    });
+
+    // Convert issue IDs to labels
+    const issueLabels = selectedIssues.map(id => ISSUE_TYPES[id]?.label || id);
+
+    // Construct user message with all context
+    const userMessage = `
+I need help writing detailed feedback about a search suggestion I didn't find helpful.
+
+Original input query: "${inputQuery}"
+
+Suggested query I didn't like: "${targetQuery}"
+
+Issues I selected: ${issueLabels.length > 0 ? issueLabels.join(", ") : "None selected"}
+
+My initial comments: ${userComments || "None yet"}
+
+Please help me write a more detailed and specific feedback comment.
+`;
+
+    const groq = new Groq({
+      apiKey: process.env.GROQ_API_KEY,
+    });
+
+    const completion = await groq.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: FEEDBACK_ASSIST_PROMPT,
+        },
+        {
+          role: "user",
+          content: userMessage,
+        },
+      ],
+      model: "llama-3.3-70b-versatile",
+      temperature: 0.7,
+      max_tokens: 1024,
+      top_p: 0.95,
+      stream: false,
+    });
+
+    const content = completion.choices[0]?.message?.content;
+
+    if (!content) {
+      logger.error("Empty response from Groq");
+      return new Response(
+        JSON.stringify({
+          assistedFeedback: "",
+          error: "Could not generate feedback assistance"
+        }),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+
+    logger.info("Successfully generated feedback assistance");
+
+    return new Response(
+      JSON.stringify({ assistedFeedback: content.trim() }),
+      {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    logger.error("API Error:", error);
+    return new Response(
+      JSON.stringify({
+        error: "An error occurred while processing your request",
+        details: error instanceof Error ? error.message : "Unknown error",
+      }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}
