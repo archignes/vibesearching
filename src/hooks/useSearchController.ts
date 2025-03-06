@@ -78,15 +78,17 @@ export function useSearchController({ devMode }: UseSearchControllerProps) {
       }
 
       console.log("📦 Received response:", data);
-      
+
       // Check if vibedQueries exists and has the expected structure
       if (!data.vibedQueries || !Array.isArray(data.vibedQueries)) {
         console.error("❌ Invalid vibedQueries data:", data.vibedQueries);
         return; // Early return to prevent further processing
       }
-      
+
       // Check if any vibedQueries are missing both vibedText and text properties
-      const missingTextQueries = data.vibedQueries.filter(q => !q.vibedText && !q.text);
+      const missingTextQueries = data.vibedQueries.filter(
+        (q: { vibedText?: string; text?: string }) => !q.vibedText && !q.text
+      );
       if (missingTextQueries.length > 0) {
         console.error("❌ Queries missing text content:", missingTextQueries);
       }
@@ -95,33 +97,38 @@ export function useSearchController({ devMode }: UseSearchControllerProps) {
         data.vibedQueries.map((q: any) => {
           // Check for either vibedText or text property (handle both formats)
           const queryText = q.vibedText || q.text;
-          
+
           // Add more defensive logic with detailed logging
           if (!queryText) {
             console.error("❌ Query missing text/vibedText:", q);
             // Provide a fallback text to prevent empty entries
-            q.vibedText = q.originalQuery || debouncedInput || "Suggested query";
+            q.vibedText =
+              q.originalQuery || debouncedInput || "Suggested query";
           }
-          
+
           return {
             id: q.id || uuidv4(),
             originalQuery: q.originalQuery || debouncedInput,
-            vibedText: queryText || q.originalQuery || debouncedInput || "Suggested query",
+            vibedText:
+              queryText ||
+              q.originalQuery ||
+              debouncedInput ||
+              "Suggested query",
             engines: q.engines || ["you"],
             timestamp: q.timestamp || Date.now(),
           };
         }) || [];
-      
+
       console.log("📝 Formatted vibed queries:", formattedVibedQueries);
 
       // Add debugging for directCompletions format
       console.log("🔎 Direct completions format:", data.directCompletions);
-      
+
       // Handle both formats - array of strings or array of objects
-      const formattedDirectCompletions = 
+      const formattedDirectCompletions =
         data.directCompletions?.map((c: any) => {
           // If directCompletions is an array of strings (as per the prompt format)
-          if (typeof c === 'string') {
+          if (typeof c === "string") {
             return {
               id: uuidv4(),
               text: c,
@@ -129,7 +136,7 @@ export function useSearchController({ devMode }: UseSearchControllerProps) {
               engines: ["you"],
             };
           }
-          
+
           // If directCompletions is an array of objects (as per our code's expectation)
           return {
             id: c.id || uuidv4(),
@@ -138,8 +145,11 @@ export function useSearchController({ devMode }: UseSearchControllerProps) {
             engines: c.engines || ["you"],
           };
         }) || [];
-        
-      console.log("📝 Formatted direct completions:", formattedDirectCompletions);
+
+      console.log(
+        "📝 Formatted direct completions:",
+        formattedDirectCompletions
+      );
 
       setVibedQueries(formattedVibedQueries);
       setDirectCompletions(formattedDirectCompletions);

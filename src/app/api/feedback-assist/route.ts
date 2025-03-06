@@ -1,5 +1,5 @@
 import { logger } from "@/lib/logger";
-import { FEEDBACK_ASSIST_PROMPT } from "@/lib/prompts/feedback-assist";
+import { FEEDBACK_ASSIST_PROMPT, getFeedbackAssistPromptWithTemplate } from "@/lib/prompts/feedback-assist";
 import { ISSUE_TYPES, IssueId } from "@/types/feedbackTypes";
 import Groq from "groq-sdk";
 
@@ -25,6 +25,7 @@ interface FeedbackAssistRequest {
   // Optional display-only fields that might be included
   selectedIssuesText?: string;
   previewText?: string;
+  useTemplate?: boolean;
 }
 
 export async function POST(req: Request) {
@@ -44,7 +45,8 @@ export async function POST(req: Request) {
       userComments, 
       devMode,
       selectedIssuesText, 
-      previewText 
+      previewText,
+      useTemplate = false
     } = await req.json() as FeedbackAssistRequest;
 
     // Return contextual mock data if in dev mode
@@ -107,7 +109,7 @@ Please write a detailed and forceful feedback comment from my perspective.
       messages: [
         {
           role: "system",
-          content: FEEDBACK_ASSIST_PROMPT,
+          content: getFeedbackAssistPromptWithTemplate(useTemplate),
         },
         {
           role: "user",

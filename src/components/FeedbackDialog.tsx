@@ -12,6 +12,7 @@ import { useState } from "react";
 import { ISSUE_TYPES, IssueId } from "@/types/feedbackTypes";
 import useSearchStore from "@/store/useSearchStore";
 import { Card } from "@/components/ui/card";
+import { FEEDBACK_ASSIST_RESPONSE_FORMAT_FULL } from "@/lib/prompts/feedback-assist-response-format-full";
 
 interface FeedbackDialogProps {
   open: boolean;
@@ -54,6 +55,8 @@ export function FeedbackDialog({
   const [isLoadingAssistance, setIsLoadingAssistance] = useState(false);
   const [showAssistanceModal, setShowAssistanceModal] = useState(false);
   const [editableComments, setEditableComments] = useState("");
+  const [useTemplate, setUseTemplate] = useState(false);
+  const [showTemplatePreview, setShowTemplatePreview] = useState(false);
 
   // Prepare context for assistance request and show the preview modal
   const handleFeedbackAssistance = () => {
@@ -127,6 +130,7 @@ export function FeedbackDialog({
       targetQuery: queryText,
       selectedIssues,
       userComments: editableComments,
+      useTemplate: useTemplate,
       devMode: process.env.NEXT_PUBLIC_DEV_MODE === "true",
       // Additional display-only fields
       selectedIssuesText: issueLabels || "None selected",
@@ -295,6 +299,48 @@ My initial comments:`,
                 onChange={(e) => setEditableComments(e.target.value)}
                 className="min-h-[100px] text-sm"
               />
+            </div>
+
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="useTemplate"
+                  checked={useTemplate}
+                  onChange={(e) => setUseTemplate(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300"
+                />
+                <label htmlFor="useTemplate" className="text-sm font-medium">
+                  Use structured template format
+                </label>
+                <button
+                  onClick={() => setShowTemplatePreview(!showTemplatePreview)}
+                  className="ml-2 text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                >
+                  {showTemplatePreview ? "Hide template" : "Show template"}
+                </button>
+              </div>
+              
+              {showTemplatePreview && (
+                <Card className="p-3 text-xs bg-gray-50 dark:bg-gray-800 whitespace-pre-line border-dashed border-blue-200 dark:border-blue-800">
+                  <div className="font-bold">Template format:</div>
+                  <div className="mt-2">
+                    {FEEDBACK_ASSIST_RESPONSE_FORMAT_FULL
+                      .replace("Format your response in markdown using this template:", "")
+                      .trim()
+                      .split('\n')
+                      .map((line, i) => (
+                        <div key={i}>
+                          {line.includes('{') && line.includes('}') ? (
+                            <span className="text-gray-500">{line}</span>
+                          ) : (
+                            line
+                          )}
+                        </div>
+                      ))}
+                  </div>
+                </Card>
+              )}
             </div>
           </div>
 

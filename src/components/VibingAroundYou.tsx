@@ -14,12 +14,12 @@ export default function VibingAroundYou(): JSX.Element {
   }
 
   const trendingQueries: string[] = [
-    "how to learn programming fast",
-    "best productivity apps 2023",
-    "ai tools for developers",
+    "how fast can an elephant run?",
+    "best productivity apps 2025",
+    "why did the titanic sink?",
     "learn typescript tutorial",
     "nextjs vs react comparison",
-    "web development roadmap 2024",
+    "web development roadmap 2025",
   ];
 
   return (
