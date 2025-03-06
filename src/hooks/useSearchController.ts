@@ -1,23 +1,23 @@
+// src/hooks/useSearchController.ts
+
 import { useEffect, useRef } from "react";
 import { useDebounce } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import useSearchStore from "@/store/useSearchStore";
-
+import useInputStore from "@/store/useInputStore";
 interface UseSearchControllerProps {
   devMode: boolean;
 }
 
 export function useSearchController({ devMode }: UseSearchControllerProps) {
   const {
-    inputValue,
-    setInputValue,
-    isStreaming,
-    setIsStreaming,
     vibedQueries,
     setVibedQueries,
     directCompletions,
     setDirectCompletions,
   } = useSearchStore();
+  const { inputValue, setInputValue, isStreaming, setIsStreaming } =
+    useInputStore();
 
   const [debouncedInput] = useDebounce(inputValue, 500);
   const abortControllerRef = useRef<AbortController | null>(null);

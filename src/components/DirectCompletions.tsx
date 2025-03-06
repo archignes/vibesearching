@@ -1,6 +1,9 @@
+// src/components/DirectCompletions.tsx
+
 "use client";
 
 import useSearchStore from "@/store/useSearchStore";
+import useInputStore from "@/store/useInputStore";
 import QueryItem from "./QueryItem";
 
 type DirectCompletionsProps = {
@@ -10,8 +13,8 @@ type DirectCompletionsProps = {
 export default function DirectCompletions({
   onSelect,
 }: DirectCompletionsProps) {
-  const { directCompletions, inputValue, setInputValue } = useSearchStore();
-
+  const { directCompletions } = useSearchStore();
+  const { inputValue, setInputValue } = useInputStore();
   if (directCompletions.length === 0 || !inputValue.trim()) return null;
 
   return (

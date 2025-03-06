@@ -1,5 +1,7 @@
+// src/store/useSearchStore.ts
+
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
+import { persist, createJSONStorage } from "zustand/middleware";
 
 export type SearchQuery = {
   id: string;
@@ -31,14 +33,6 @@ interface FeedbackItem {
 }
 
 type SearchStore = {
-  // Current input
-  inputValue: string;
-  setInputValue: (value: string) => void;
-
-  // Streaming state
-  isStreaming: boolean;
-  setIsStreaming: (value: boolean) => void;
-
   // Results
   vibedQueries: VibedQuery[];
   setVibedQueries: (queries: VibedQuery[]) => void;
@@ -53,10 +47,6 @@ type SearchStore = {
   clearHistory: () => void;
   starQuery: (id: string, starred: boolean) => void;
 
-  // UI state
-  showMoreVibes: boolean;
-  toggleShowMoreVibes: () => void;
-
   // Feedback
   starredQueries: FeedbackItem[];
   dislikedQueries: FeedbackItem[];
@@ -70,14 +60,6 @@ type SearchStore = {
 const useSearchStore = create<SearchStore>()(
   persist(
     (set, get) => ({
-      // Current input
-      inputValue: "",
-      setInputValue: (value) => set({ inputValue: value }),
-
-      // Streaming state
-      isStreaming: false,
-      setIsStreaming: (value) => set({ isStreaming: value }),
-
       // Results
       vibedQueries: [],
       setVibedQueries: (queries) => set({ vibedQueries: queries }),
@@ -104,21 +86,14 @@ const useSearchStore = create<SearchStore>()(
           ),
         })),
 
-      // UI state
-      showMoreVibes: false,
-      toggleShowMoreVibes: () =>
-        set((state) => ({ showMoreVibes: !state.showMoreVibes })),
-
       // Feedback
       starredQueries: [],
       dislikedQueries: [],
-
       toggleStar: (query: string, note?: string) =>
         set((state) => {
           const isCurrentlyStarred = state.starredQueries.some(
             (f) => f.query === query
           );
-          // Remove from disliked if present
           const newDisliked = state.dislikedQueries.filter(
             (f) => f.query !== query
           );
@@ -139,7 +114,6 @@ const useSearchStore = create<SearchStore>()(
           const isCurrentlyDisliked = state.dislikedQueries.some(
             (f) => f.query === query
           );
-          // Remove from starred if present
           const newStarred = state.starredQueries.filter(
             (f) => f.query !== query
           );
@@ -166,7 +140,8 @@ const useSearchStore = create<SearchStore>()(
       },
     }),
     {
-      name: "search-store",
+      name: "vibesearching-persistent-store",
+      storage: createJSONStorage(() => localStorage),
     }
   )
 );

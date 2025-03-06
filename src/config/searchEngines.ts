@@ -8,6 +8,7 @@ export const SEARCH_ENGINES = [
     name: "Perplexity",
     favicon: "/favicons/perplexity-ai.ico",
   },
+  { id: "jina", name: "Jina AI Deep Search", favicon: "/favicons/jina.ico" },
 ] as const;
 
 export type SearchEngineId = (typeof SEARCH_ENGINES)[number]["id"];

@@ -1,0 +1,18 @@
+---
+description: help the user add a query quickly
+globs: src/data/interestingQueries.ts
+---
+parse the user's input to add a query to the interestingQueries array in [interestingQueries.ts](mdc:src/data/interestingQueries.ts) src/data/interestingQueries.ts:
+text is the query
+source url
+source text is the author lastnames and year
+logo is the appropriate item from public/favicons/
+Example:  
+  {
+    text: "best quality newspapers in the us",
+    source: {
+      url: "https://emmalurie.github.io/docs/websci18-investigating.pdf",
+      text: "Lurie & Mustafaraj (2018)",
+      logo: "/favicons/default.png",
+    },
+  },

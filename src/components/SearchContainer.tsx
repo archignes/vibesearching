@@ -3,13 +3,13 @@
 import { useRef, useEffect, useState } from "react";
 import SearchInput from "./SearchInput";
 import DirectCompletions from "./DirectCompletions";
-import useSearchStore from "@/store/useSearchStore";
+import useInputStore from "@/store/useInputStore";
 import type { SearchContainerProps } from "@/types/componentTypes";
 
 export default function SearchContainer({
   onSelect,
 }: SearchContainerProps): JSX.Element {
-  const { inputValue } = useSearchStore();
+  const { inputValue } = useInputStore();
   const containerRef = useRef<HTMLDivElement>(null);
   const [showCompletions, setShowCompletions] = useState(true);
 

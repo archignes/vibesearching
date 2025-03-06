@@ -1,3 +1,5 @@
+// src/components/FeedbackDialog.tsx
+
 import {
   Dialog,
   DialogContent,
@@ -7,12 +9,12 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import { ISSUE_TYPES, IssueId } from "@/types/feedbackTypes";
-import useSearchStore from "@/store/useSearchStore";
+import useInputStore from "@/store/useInputStore";
 import { Card } from "@/components/ui/card";
 import { FEEDBACK_ASSIST_RESPONSE_FORMAT_FULL } from "@/lib/prompts/feedback-assist-response-format-full";
+import useSearchStore from "@/store/useSearchStore";
 
 interface FeedbackDialogProps {
   open: boolean;
@@ -30,7 +32,8 @@ export function FeedbackDialog({
   const [noteText, setNoteText] = useState("");
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [showAdditionalButtons, setShowAdditionalButtons] = useState(false);
-  const { inputValue, vibedQueries } = useSearchStore();
+  const { inputValue } = useInputStore();
+  const { vibedQueries } = useSearchStore();
 
   // Find if the feedback is for a vibed query
   const isVibedQuery = vibedQueries.some((vq) => vq.vibedText === queryText);
@@ -320,18 +323,20 @@ My initial comments:`,
                   {showTemplatePreview ? "Hide template" : "Show template"}
                 </button>
               </div>
-              
+
               {showTemplatePreview && (
                 <Card className="p-3 text-xs bg-gray-50 dark:bg-gray-800 whitespace-pre-line border-dashed border-blue-200 dark:border-blue-800">
                   <div className="font-bold">Template format:</div>
                   <div className="mt-2">
-                    {FEEDBACK_ASSIST_RESPONSE_FORMAT_FULL
-                      .replace("Format your response in markdown using this template:", "")
+                    {FEEDBACK_ASSIST_RESPONSE_FORMAT_FULL.replace(
+                      "Format your response in markdown using this template:",
+                      ""
+                    )
                       .trim()
-                      .split('\n')
+                      .split("\n")
                       .map((line, i) => (
                         <div key={i}>
-                          {line.includes('{') && line.includes('}') ? (
+                          {line.includes("{") && line.includes("}") ? (
                             <span className="text-gray-500">{line}</span>
                           ) : (
                             line

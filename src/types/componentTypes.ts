@@ -17,16 +17,23 @@ export type VibedQueriesProps = {
 /**
  * Props for the QueryItem component
  */
+interface SourceInfo {
+  logo?: string;
+  text: string;
+  url: string;
+}
+
 export interface QueryItemProps {
   text: string;
   engines?: string[];
-  onSelect: (query: string, engine: string) => void;
-  onRevibe: (value: string) => void;
-  variant: "vibed" | "direct";
-  isStarred: boolean;
-  isDisliked: boolean;
-  onStar: (query: string, note?: string) => void;
-  onDislike: (query: string, note?: string, issues?: string[]) => void;
+  onSelect: (text: string, engine: string) => void;
+  onRevibe: (text: string) => void;
+  variant: "vibed" | "direct" | "vibingaroundyou";
+  isStarred?: boolean;
+  isDisliked?: boolean;
+  onStar?: (text: string) => void;
+  onDislike: (text: string, note?: string, issues?: string[]) => void;
+  sourceInfo?: SourceInfo;
 }
 
 /**
