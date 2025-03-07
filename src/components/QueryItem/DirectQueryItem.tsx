@@ -5,13 +5,9 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { MoreVertical, ThumbsDown } from "lucide-react";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { SEARCH_ENGINES } from "@/config/searchEngines";
 import { QueryItemProps } from "./QueryItem.types";
+import Image from "next/image";
 
 interface DirectQueryItemProps extends QueryItemProps {}
 
@@ -24,8 +20,6 @@ export const DirectQueryItem: React.FC<DirectQueryItemProps> = ({
   onRevibe,
   onSelect,
   onDislike,
-  engines = ["you"],
-  isDisliked,
 }) => {
   const [showActions, setShowActions] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -87,7 +81,7 @@ export const DirectQueryItem: React.FC<DirectQueryItemProps> = ({
                   className="p-1.5 hover:bg-gray-100 dark:hover:bg-gray-700 rounded"
                   title={engine.name}
                 >
-                  <img
+                  <Image
                     src={engine.favicon}
                     alt={engine.name}
                     className="w-4 h-4 object-contain"

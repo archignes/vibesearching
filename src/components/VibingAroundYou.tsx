@@ -4,7 +4,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { RefreshCw } from "lucide-react";
-import QueryItem from "./QueryItem";
+import QueryItem from "./QueryItem/Core";
 import useInputStore from "@/store/useInputStore";
 import useSearchStore from "@/store/useSearchStore";
 import { interestingQueries } from "@/data/interestingQueries";
@@ -26,7 +26,7 @@ export default function VibingAroundYou({
   const { toggleStar, toggleDislike, isStarred, isDisliked } = useSearchStore();
 
   // Shuffle all the queries
-  const shuffleQueries = () => {
+  const shuffleQueries = (): void => {
     const shuffled = [...interestingQueries].sort(() => 0.5 - Math.random());
     setShuffledQueries(shuffled);
   };
@@ -40,7 +40,7 @@ export default function VibingAroundYou({
   useEffect(() => {
     if (!shuffledQueries.length || !containerRef.current) return;
 
-    const calculateVisibleQueries = () => {
+    const calculateVisibleQueries = (): void => {
       if (!containerRef.current) return;
       // Container height minus header (for padding, borders, margins, and header)
       const containerHeight = containerRef.current.clientHeight;
@@ -94,12 +94,12 @@ export default function VibingAroundYou({
   }, [shuffledQueries]);
 
   // Handle refresh - shuffle again
-  const handleRefresh = (e: React.MouseEvent) => {
+  const handleRefresh = (e: React.MouseEvent): void => {
     e.stopPropagation(); // Prevent the container click handler from firing
     shuffleQueries();
   };
 
-  const handleQueryClick = () => {
+  const handleQueryClick = (): void => {
     setIsAnimating(true);
     // Notify parent component to show loading screen
     if (onVibeStart) {
@@ -139,6 +139,7 @@ export default function VibingAroundYou({
             engines={[]}
             isStarred={isStarred(query.text)}
             isDisliked={isDisliked(query.text)}
+            isActive={false}
             onStar={() => toggleStar(query.text)}
             onDislike={(text, note) => toggleDislike(text, note)}
             sourcesInfo={query.sources}

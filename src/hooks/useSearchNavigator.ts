@@ -3,10 +3,12 @@
 import { v4 as uuidv4 } from "uuid";
 import useSearchStore from "@/store/useSearchStore";
 
-export function useSearchNavigator() {
+export function useSearchNavigator(): {
+  handleSearch: (query: string, engine?: string) => void;
+} {
   const { addToHistory } = useSearchStore();
 
-  const handleSearch = (query: string, engine: string = "you"): void => {
+  const handleSearch = (query: string, engine = "you"): void => {
     // Add to history
     addToHistory({
       id: uuidv4(),
@@ -15,7 +17,7 @@ export function useSearchNavigator() {
     });
 
     // Construct search URL based on engine
-    let searchUrl: string = "";
+    let searchUrl = "";
 
     switch (engine) {
       case "you":

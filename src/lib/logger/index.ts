@@ -7,7 +7,7 @@ export const logger = {
    * @param message - Main message to log
    * @param args - Additional arguments to log
    */
-  info: (message: string, ...args: any[]) => {
+  info: (message: string, ...args: string[]): void => {
     console.log(`[INFO] ${message}`, ...args);
   },
 
@@ -16,7 +16,7 @@ export const logger = {
    * @param message - Main message to log
    * @param args - Additional arguments to log
    */
-  warn: (message: string, ...args: any[]) => {
+  warn: (message: string, ...args: string[]): void => {
     console.warn(`[WARN] ${message}`, ...args);
   },
 
@@ -25,7 +25,7 @@ export const logger = {
    * @param message - Main message to log
    * @param args - Additional arguments to log
    */
-  error: (message: string, ...args: any[]) => {
+  error: (message: string, ...args: string[]): void => {
     console.error(`[ERROR] ${message}`, ...args);
   },
 
@@ -34,7 +34,7 @@ export const logger = {
    * @param message - Main message to log
    * @param args - Additional arguments to log
    */
-  debug: (message: string, ...args: any[]) => {
+  debug: (message: string, ...args: string[]): void => {
     if (process.env.NODE_ENV !== "production") {
       console.debug(`[DEBUG] ${message}`, ...args);
     }

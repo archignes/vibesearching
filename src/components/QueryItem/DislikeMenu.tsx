@@ -46,7 +46,7 @@ export const DislikeMenu: React.FC<DislikeMenuProps> = ({
     setShowDislikeOptions(false);
   });
 
-  const handleDislike = () => {
+  const handleDislike = (): void => {
     if (isDisliked) {
       setShowDislikeOptions(!showDislikeOptions);
     } else {

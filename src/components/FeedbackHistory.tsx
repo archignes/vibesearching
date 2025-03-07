@@ -1,3 +1,5 @@
+// src/components/FeedbackHistory.tsx
+
 "use client";
 
 import useSearchStore from "@/store/useSearchStore";
@@ -27,7 +29,7 @@ interface FeedbackHistoryProps {
 export default function FeedbackHistory({
   open,
   onOpenChange,
-}: FeedbackHistoryProps) {
+}: FeedbackHistoryProps): JSX.Element {
   const { dislikedQueries } = useSearchStore() as {
     dislikedQueries: DislikedFeedbackItem[];
   };
@@ -37,7 +39,9 @@ export default function FeedbackHistory({
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader className="flex flex-row items-center gap-2">
           <ThumbsDown size={16} className="text-red-500" />
-          <DialogTitle>Not Helpful Queries ({dislikedQueries.length})</DialogTitle>
+          <DialogTitle>
+            Not Helpful Queries ({dislikedQueries.length})
+          </DialogTitle>
         </DialogHeader>
 
         <div className="max-h-[60vh] overflow-y-auto rounded-md border dark:border-gray-700">

@@ -15,7 +15,7 @@ import { QueryItemProps, QueryVariant } from "./QueryItem.types";
 import { EngineButtons } from "./EngineButtons";
 import { DislikeMenu } from "./DislikeMenu";
 import { FeedbackDialog } from "@/components/FeedbackDialog";
-
+import Image from "next/image";
 interface InteractiveQueryItemProps extends QueryItemProps {}
 
 /**
@@ -30,6 +30,7 @@ export const InteractiveQueryItem: React.FC<InteractiveQueryItemProps> = ({
   variant,
   isStarred,
   isDisliked,
+  isActive,
   onStar,
   onDislike,
   sourcesInfo,
@@ -39,26 +40,28 @@ export const InteractiveQueryItem: React.FC<InteractiveQueryItemProps> = ({
   const baseClasses = "shadow-sm border dark:border-gray-700";
   const variantClasses: Record<QueryVariant, string> = {
     vibed:
-      "p-3 rounded-lg border-black/10 bg-white dark:bg-gray-800 dark:border-white/10",
+      "p-3 rounded-lg border-black/10 bg-white dark:bg-gray-800 dark:border-white/10 hover:border-purple-500 transition-colors",
     direct: "p-1 border-transparent bg-white dark:bg-gray-900", // not used in this component
     vibingaroundyou:
-      "p-3 rounded-lg border-black/10 bg-white dark:bg-gray-800 dark:border-white/10 hover:border-purple-500",
+      "p-3 rounded-lg border-black/10 bg-white dark:bg-gray-800 dark:border-white/10 hover:border-purple-500 transition-colors",
   };
 
-  const handleStar = (e: React.MouseEvent) => {
+  const handleStar = (e: React.MouseEvent): void => {
     e.stopPropagation();
     if (onStar) {
       onStar(text);
     }
   };
 
-  const handleSubmitNote = (note: string, issues: string[]) => {
+  const handleSubmitNote = (note: string, issues: string[]): void => {
     onDislike(text, note, issues);
   };
 
   const content = (
     <div
-      className={`${baseClasses} ${variantClasses[variant]}`}
+      className={`${baseClasses} ${variantClasses[variant]} ${
+        isActive ? "border-purple-500 ring-1 ring-purple-500" : ""
+      }`}
       onClick={() => onRevibe(text)}
     >
       <p className="text-sm mb-2">{text}</p>
@@ -146,7 +149,7 @@ export const InteractiveQueryItem: React.FC<InteractiveQueryItemProps> = ({
                   onClick={(e) => e.stopPropagation()}
                 >
                   {source.logo && (
-                    <img
+                    <Image
                       src={source.logo}
                       alt={source.text}
                       className="w-4 h-4 object-contain inline-block"

@@ -23,10 +23,12 @@ Write a concise but detailed feedback comment from the user's perspective. The c
 Format your response as a plain text comment the user could submit.`;
 
 export const getFeedbackAssistPromptWithTemplate = (
-  useTemplate: boolean = false
-) => {
+  useTemplate = false
+): string => {
   if (!useTemplate) {
-    return FEEDBACK_ASSIST_PROMPT;
+    return `${FEEDBACK_ASSIST_PROMPT}
+
+${FEEDBACK_ASSIST_RESPONSE_FORMAT_MINIMAL}`;
   }
 
   return `${FEEDBACK_ASSIST_PROMPT}

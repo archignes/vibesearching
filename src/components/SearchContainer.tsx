@@ -6,27 +6,29 @@ import DirectCompletions from "./DirectCompletions";
 import useInputStore from "@/store/useInputStore";
 import type { SearchContainerProps } from "@/types/componentTypes";
 
-export default function SearchContainer({
+export function SearchContainer({
   onSelect,
+  handleKeyDown,
+  activeSection,
+  activeIndex,
 }: SearchContainerProps): JSX.Element {
-  const { inputValue } = useInputStore();
   const containerRef = useRef<HTMLDivElement>(null);
+  const { inputValue } = useInputStore();
+
+  // Show/hide direct completions list
   const [showCompletions, setShowCompletions] = useState(true);
 
-  // Handle click outside and inside
+  // If user clicks anywhere outside container, we hide completions
   useEffect(() => {
-    function handleClick(event: MouseEvent) {
+    function handleClick(event: MouseEvent): void {
       if (containerRef.current?.contains(event.target as Node)) {
-        setShowCompletions(true); // Show when clicking inside
+        setShowCompletions(true);
       } else {
-        setShowCompletions(false); // Hide when clicking outside
+        setShowCompletions(false);
       }
     }
-
     document.addEventListener("mousedown", handleClick);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-    };
+    return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
   return (
@@ -35,9 +37,13 @@ export default function SearchContainer({
       ref={containerRef}
     >
       <div className="relative w-full mb-0 pb-0 p-0 rounded-md overflow-visible">
-        <SearchInput />
+        {/* We intercept keyDown on the SearchInput */}
+        <SearchInput onKeyDown={handleKeyDown} />
         {inputValue.trim().length > 0 && showCompletions && (
-          <DirectCompletions onSelect={onSelect} />
+          <DirectCompletions
+            onSelect={onSelect}
+            activeIndex={activeSection === "direct" ? activeIndex : -1}
+          />
         )}
       </div>
     </div>

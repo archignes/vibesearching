@@ -17,7 +17,7 @@ interface StarredQueriesProps {
 export default function StarredQueries({
   open,
   onOpenChange,
-}: StarredQueriesProps) {
+}: StarredQueriesProps): JSX.Element {
   const { starredQueries } = useSearchStore();
 
   return (

@@ -28,7 +28,7 @@ export function FeedbackDialog({
   onOpenChange,
   onSubmit,
   queryText,
-}: FeedbackDialogProps) {
+}: FeedbackDialogProps): JSX.Element {
   const [noteText, setNoteText] = useState("");
   const [selectedIssues, setSelectedIssues] = useState<string[]>([]);
   const [showAdditionalButtons, setShowAdditionalButtons] = useState(false);
@@ -39,7 +39,9 @@ export function FeedbackDialog({
   const isVibedQuery = vibedQueries.some((vq) => vq.vibedText === queryText);
 
   // Handle note text changes and show additional buttons when user starts typing
-  const handleNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleNoteChange = (
+    e: React.ChangeEvent<HTMLTextAreaElement>
+  ): void => {
     const text = e.target.value;
     setNoteText(text);
 
@@ -47,7 +49,7 @@ export function FeedbackDialog({
     setShowAdditionalButtons(text.length > 0);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (): void => {
     onSubmit(noteText, selectedIssues as IssueId[]);
     setNoteText("");
     setSelectedIssues([]);
@@ -62,7 +64,7 @@ export function FeedbackDialog({
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
 
   // Prepare context for assistance request and show the preview modal
-  const handleFeedbackAssistance = () => {
+  const handleFeedbackAssistance = (): void => {
     // Initialize editable comments with current noteText
     setEditableComments(noteText);
     // Show the modal
@@ -70,7 +72,7 @@ export function FeedbackDialog({
   };
 
   // Send the actual API request with user-reviewed context
-  const requestFeedbackAssistance = async () => {
+  const requestFeedbackAssistance = async (): Promise<void> => {
     setIsLoadingAssistance(true);
     setShowAssistanceModal(false);
 
@@ -105,7 +107,7 @@ export function FeedbackDialog({
     }
   };
 
-  const handleGitHubIssue = () => {
+  const handleGitHubIssue = (): void => {
     // Open GitHub issue form
     window.open(
       "https://github.com/archignes/vibesearching/issues/new",
@@ -113,7 +115,7 @@ export function FeedbackDialog({
     );
   };
 
-  const toggleIssue = (issueId: string) => {
+  const toggleIssue = (issueId: string): void => {
     setSelectedIssues((prev) =>
       prev.includes(issueId)
         ? prev.filter((id) => id !== issueId)
@@ -122,7 +124,16 @@ export function FeedbackDialog({
   };
 
   // Helper function to create the context for the API request - used by both preview and API
-  const createApiContext = () => {
+  const createApiContext = (): {
+    inputQuery: string;
+    targetQuery: string;
+    selectedIssues: string[];
+    userComments: string;
+    useTemplate: boolean;
+    devMode: boolean;
+    selectedIssuesText: string;
+    previewText: string;
+  } => {
     // Convert issue IDs to labels
     const issueLabels = selectedIssues
       .map((id) => ISSUE_TYPES[id as IssueId]?.label || id)
@@ -178,7 +189,7 @@ My initial comments:`,
             <div>
               <div className="text-sm font-medium mb-1 flex items-center">
                 <span className="text-red-500 mr-2">★</span>
-                Query you're providing feedback on:
+                Query you&apos;re providing feedback on:
               </div>
               <Card className="p-3 text-sm border-red-200 dark:border-red-800">
                 {queryText}
@@ -209,7 +220,9 @@ My initial comments:`,
 
           {/* Issue selection - simplified approach */}
           <div className="mb-4">
-            <div className="text-sm font-medium mb-2">What's the issue?</div>
+            <div className="text-sm font-medium mb-2">
+              What&apos;s the issue?
+            </div>
             <div className="flex flex-wrap gap-2 mb-4">
               {Object.values(ISSUE_TYPES).map((issue) => {
                 const isSelected = selectedIssues.includes(issue.label);
@@ -285,7 +298,7 @@ My initial comments:`,
           <div className="space-y-4">
             <div>
               <div className="text-sm font-medium mb-2">
-                Here's what we'll send to the AI assistant:
+                Here&apos;s what we&apos;ll send to the AI assistant:
               </div>
               <Card className="p-3 bg-gray-50 dark:bg-gray-800 text-xs whitespace-pre-line">
                 {createApiContext().previewText}

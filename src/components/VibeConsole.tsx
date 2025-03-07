@@ -2,15 +2,16 @@
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, KeyboardEvent } from "react";
 import VibedQueries from "./VibedQueries";
-import SearchContainer from "./SearchContainer";
+import { SearchContainer } from "./SearchContainer";
 import VibingAroundYou from "./VibingAroundYou";
 import LoadingVibes from "./LoadingVibes";
 import { useSearchController } from "@/hooks/useSearchController";
 import { useSearchNavigator } from "@/hooks/useSearchNavigator";
 import type { VibeConsoleProps } from "@/types/componentTypes";
 import useInputStore from "@/store/useInputStore";
+import { useArrowNavigation } from "@/hooks/useArrowNavigation";
 
 export default function VibeConsole({
   devMode,
@@ -23,6 +24,35 @@ export default function VibeConsole({
     useSearchController({ devMode });
 
   const { handleSearch } = useSearchNavigator();
+
+  const {
+    state: { activeSection, activeIndex },
+    handleKeyDown: baseHandleKeyDown,
+  } = useArrowNavigation(directCompletions.length, vibedQueries.length);
+
+  // Enhanced handleKeyDown that includes Enter key functionality
+  const handleKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>): void => {
+    baseHandleKeyDown(e);
+
+    if (e.key === "Enter") {
+      // If user is in direct completions, select that item
+      if (activeSection === "direct" && activeIndex >= 0) {
+        const item = directCompletions[activeIndex];
+        if (item) {
+          handleSearch(item.text, item.engines?.[0]);
+        }
+      }
+      // If user is on a vibed item, open quick actions or do something
+      else if (activeSection === "vibed" && activeIndex >= 0) {
+        e.preventDefault();
+        const vibed = vibedQueries[activeIndex];
+        if (vibed) {
+          // For example, you could open a small popover or show a list of quick actions
+          alert(`Quick actions for: "${vibed.vibedText}"\n(placeholder)`);
+        }
+      }
+    }
+  };
 
   // Set initial input value in dev:mock mode
   useEffect(() => {
@@ -87,7 +117,11 @@ export default function VibeConsole({
             </div>
 
             {/* LoadingVibes */}
-            <div className="absolute inset-0 z-20">
+            <div
+              className={`absolute inset-0 z-20 ${
+                !showLoader ? "pointer-events-none opacity-0" : ""
+              }`}
+            >
               <LoadingVibes isVisible={showLoader} />
             </div>
 
@@ -99,7 +133,10 @@ export default function VibeConsole({
                   : "opacity-0 z-0 pointer-events-none"
               }`}
             >
-              <VibedQueries onSelect={handleSearch} />
+              <VibedQueries
+                onSelect={handleSearch}
+                activeIndex={activeSection === "vibed" ? activeIndex : -1}
+              />
             </div>
           </div>
         </div>
@@ -108,7 +145,12 @@ export default function VibeConsole({
       {/* Search component with more space for completions */}
       <div className="relative z-40 mb-auto h-[160px]">
         <div className="relative inset-x-0 bottom-0 pb-8 bg-gradient-to-t from-white via-white to-transparent dark:from-gray-900 dark:via-gray-900">
-          <SearchContainer onSelect={handleSearch} />
+          <SearchContainer
+            onSelect={handleSearch}
+            handleKeyDown={handleKeyDown}
+            activeSection={activeSection}
+            activeIndex={activeIndex}
+          />
         </div>
       </div>
     </div>

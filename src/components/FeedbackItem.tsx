@@ -1,3 +1,5 @@
+// src/components/FeedbackItem.tsx
+
 import { format } from "date-fns";
 
 interface FeedbackItemProps {
@@ -6,7 +8,11 @@ interface FeedbackItemProps {
   timestamp: number;
 }
 
-export function FeedbackItem({ query, note, timestamp }: FeedbackItemProps) {
+export function FeedbackItem({
+  query,
+  note,
+  timestamp,
+}: FeedbackItemProps): JSX.Element {
   return (
     <div className="p-4 border-b last:border-b-0 dark:border-gray-700">
       <p className="font-medium">{query}</p>

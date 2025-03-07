@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, KeyboardEventHandler } from "react";
 import useInputStore from "@/store/useInputStore";
 
-export default function SearchInput() {
+interface SearchInputProps {
+  onKeyDown?: KeyboardEventHandler<HTMLTextAreaElement>;
+}
+
+export default function SearchInput({
+  onKeyDown,
+}: SearchInputProps): JSX.Element {
   const { inputValue, setInputValue } = useInputStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -11,10 +17,7 @@ export default function SearchInput() {
   useEffect(() => {
     const textarea = textareaRef.current;
     if (!textarea) return;
-
-    // Reset height to get the correct scrollHeight
     textarea.style.height = "auto";
-    // Set new height based on scrollHeight
     textarea.style.height = `${textarea.scrollHeight}px`;
   }, [inputValue]);
 
@@ -27,6 +30,7 @@ export default function SearchInput() {
         placeholder="Search with vibes..."
         className="w-full min-h-[48px] max-h-[200px] p-3 pr-10 bg-white dark:bg-gray-800 rounded-lg border-2 border-blue-400/30 dark:border-blue-500/20 shadow-sm resize-none overflow-hidden focus:outline-none focus:ring-0 focus:border-blue-500 relative z-10"
         rows={1}
+        onKeyDown={onKeyDown}
       />
       {inputValue && (
         <button

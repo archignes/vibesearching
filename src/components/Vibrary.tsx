@@ -4,7 +4,7 @@ import { useState } from "react";
 import useSearchStore from "@/store/useSearchStore";
 import { Trash2, ChevronUp, ChevronDown, Star, Clock } from "lucide-react";
 
-export default function Vibrary() {
+export default function Vibrary(): JSX.Element | null {
   const { searchHistory, clearHistory, starQuery } = useSearchStore();
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -13,7 +13,7 @@ export default function Vibrary() {
   }
 
   // Format timestamp
-  const formatTime = (timestamp: number) => {
+  const formatTime = (timestamp: number): string => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   };

@@ -25,6 +25,8 @@ export interface QueryItemProps {
   onRevibe: (text: string) => void;
   /** The variant to render. */
   variant: QueryVariant;
+  /** Whether the query is active. */
+  isActive?: boolean;
   /** Whether the query is starred. */
   isStarred?: boolean;
   /** Whether the query is disliked. */

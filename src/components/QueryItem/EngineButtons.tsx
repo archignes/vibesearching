@@ -10,7 +10,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { SEARCH_ENGINES } from "@/config/searchEngines";
-
+import Image from "next/image";
 interface EngineButtonsProps {
   /** Array of engine identifiers. */
   engines: string[];
@@ -44,7 +44,7 @@ export const EngineButtons: React.FC<EngineButtonsProps> = ({
                 className="px-1 py-1 text-xs rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors flex items-center gap-1.5"
               >
                 {engineData && (
-                  <img
+                  <Image
                     src={engineData.favicon}
                     alt={engineData.name}
                     className="w-3.5 h-3.5 object-contain"

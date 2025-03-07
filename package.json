@@ -7,7 +7,9 @@
     "dev:mock": "NEXT_PUBLIC_DEV_MODE=true next dev -p 3002",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint src --ext .ts,.tsx --fix",
+    "lint:check": "eslint src --ext .ts,.tsx",
+    "typecheck": "tsc --noEmit",
     "test": "jest"
   },
   "dependencies": {
@@ -42,6 +44,8 @@
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.7",
+    "@typescript-eslint/eslint-plugin": "^7.1.0",
+    "@typescript-eslint/parser": "^7.1.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.0.4",

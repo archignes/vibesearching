@@ -1,7 +1,6 @@
 // src/app/page.tsx
 
 import Logo from "@/components/Logo";
-import VibingAroundYou from "@/components/VibingAroundYou";
 import Vibrary from "@/components/Vibrary";
 import VibeConsole from "@/components/VibeConsole";
 import Settings from "@/components/Settings";

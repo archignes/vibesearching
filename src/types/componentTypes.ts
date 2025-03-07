@@ -1,5 +1,7 @@
 // src/types/componentTypes.ts
 
+import { KeyboardEventHandler } from "react";
+
 /**
  * Props for the VibeConsole component
  */
@@ -53,6 +55,9 @@ export interface QueryItemProps {
 /**
  * Props for the SearchContainer component
  */
-export type SearchContainerProps = {
+export interface SearchContainerProps {
   onSelect: (query: string, engine?: string) => void;
-};
+  handleKeyDown: KeyboardEventHandler<HTMLTextAreaElement>;
+  activeSection: "input" | "direct" | "vibed";
+  activeIndex: number;
+}

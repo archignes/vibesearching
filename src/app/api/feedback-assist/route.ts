@@ -1,18 +1,25 @@
 import { logger } from "@/lib/logger";
-import { FEEDBACK_ASSIST_PROMPT, getFeedbackAssistPromptWithTemplate } from "@/lib/prompts/feedback-assist";
+import { getFeedbackAssistPromptWithTemplate } from "@/lib/prompts/feedback-assist";
 import { ISSUE_TYPES, IssueId } from "@/types/feedbackTypes";
 import Groq from "groq-sdk";
 
 export const runtime = "edge";
 
 // Generate a more contextual mock response based on actual input
-const getMockResponse = (inputQuery: string, targetQuery: string, issues: IssueId[]) => {
+const getMockResponse = (
+  inputQuery: string,
+  targetQuery: string,
+  issues: IssueId[]
+): {
+  assistedFeedback: string;
+} => {
   // Convert issue IDs to labels
-  const issueLabels = issues.map(id => ISSUE_TYPES[id]?.label || id);
-  const issuesText = issueLabels.length > 0 ? issueLabels.join(", ") : "relevance";
-  
+  const issueLabels = issues.map((id) => ISSUE_TYPES[id]?.label || id);
+  const issuesText =
+    issueLabels.length > 0 ? issueLabels.join(", ") : "relevance";
+
   return {
-    assistedFeedback: `This suggested query "${targetQuery}" doesn't help with my original question about "${inputQuery}". It has issues with ${issuesText}. I was hoping for a suggestion that would directly address my specific needs rather than this unhelpful recommendation.`
+    assistedFeedback: `This suggested query "${targetQuery}" doesn't help with my original question about "${inputQuery}". It has issues with ${issuesText}. I was hoping for a suggestion that would directly address my specific needs rather than this unhelpful recommendation.`,
   };
 };
 
@@ -28,7 +35,7 @@ interface FeedbackAssistRequest {
   useTemplate?: boolean;
 }
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   if (!process.env.GROQ_API_KEY) {
     logger.error("Missing GROQ_API_KEY");
     return new Response(
@@ -38,21 +45,27 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { 
-      inputQuery, 
-      targetQuery, 
-      selectedIssues, 
-      userComments, 
+    const {
+      inputQuery,
+      targetQuery,
+      selectedIssues,
+      userComments,
       devMode,
-      selectedIssuesText, 
+      selectedIssuesText,
       previewText,
-      useTemplate = false
-    } = await req.json() as FeedbackAssistRequest;
+      useTemplate = false,
+    } = (await req.json()) as FeedbackAssistRequest;
 
     // Return contextual mock data if in dev mode
     if (devMode) {
-      logger.info("Dev mode: returning contextual mock feedback assist response");
-      const mockResponse = getMockResponse(inputQuery, targetQuery, selectedIssues);
+      logger.info(
+        "Dev mode: returning contextual mock feedback assist response"
+      );
+      const mockResponse = getMockResponse(
+        inputQuery,
+        targetQuery,
+        selectedIssues
+      );
       return new Response(JSON.stringify(mockResponse), {
         status: 200,
         headers: { "Content-Type": "application/json" },
@@ -67,15 +80,13 @@ export async function POST(req: Request) {
       );
     }
 
-    logger.info("Processing feedback assist request", { 
-      inputQuery, 
-      targetQuery, 
-      selectedIssues 
-    });
+    logger.info(
+      `Processing feedback assist request: ${inputQuery}, ${targetQuery}, ${selectedIssues}`
+    );
 
     // Format the message from either the previewText (if provided) or construct it ourselves
     let userMessage;
-    
+
     if (req.body && previewText) {
       // Use the preview text from the frontend if available, and append user comments
       userMessage = `${previewText} ${userComments || "None yet"}
@@ -83,9 +94,13 @@ export async function POST(req: Request) {
 Please write a detailed and forceful feedback comment from my perspective.`;
     } else {
       // Otherwise construct the message from scratch
-      const issueLabels = selectedIssues.map(id => ISSUE_TYPES[id]?.label || id);
-      const issuesText = selectedIssuesText || (issueLabels.length > 0 ? issueLabels.join(", ") : "None selected");
-      
+      const issueLabels = selectedIssues.map(
+        (id) => ISSUE_TYPES[id]?.label || id
+      );
+      const issuesText =
+        selectedIssuesText ||
+        (issueLabels.length > 0 ? issueLabels.join(", ") : "None selected");
+
       userMessage = `
 I need help writing detailed feedback about a search suggestion I didn't find helpful.
 
@@ -130,7 +145,7 @@ Please write a detailed and forceful feedback comment from my perspective.
       return new Response(
         JSON.stringify({
           assistedFeedback: "",
-          error: "Could not generate feedback assistance"
+          error: "Could not generate feedback assistance",
         }),
         {
           status: 200,
@@ -141,15 +156,12 @@ Please write a detailed and forceful feedback comment from my perspective.
 
     logger.info("Successfully generated feedback assistance");
 
-    return new Response(
-      JSON.stringify({ assistedFeedback: content.trim() }),
-      {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }
-    );
+    return new Response(JSON.stringify({ assistedFeedback: content.trim() }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
   } catch (error) {
-    logger.error("API Error:", error);
+    logger.error(`API Error: ${error}`);
     return new Response(
       JSON.stringify({
         error: "An error occurred while processing your request",

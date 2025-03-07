@@ -5,7 +5,24 @@ import Groq from "groq-sdk";
 export const runtime = "edge";
 
 // Generate mock responses based on the actual query
-const getMockResponse = (query: string) => {
+const getMockResponse = (
+  query: string
+): {
+  originalQuery: string;
+  vibedQueries: {
+    id: string;
+    originalQuery: string;
+    text: string;
+    engines: string[];
+    timestamp: number;
+  }[];
+  directCompletions: {
+    id: string;
+    text: string;
+    matchScore: number;
+    engines: string[];
+  }[];
+} => {
   return {
     originalQuery: query,
     vibedQueries: [
@@ -54,7 +71,7 @@ const getMockResponse = (query: string) => {
   };
 };
 
-export async function POST(req: Request) {
+export async function POST(req: Request): Promise<Response> {
   if (!process.env.GROQ_API_KEY) {
     logger.error("Missing GROQ_API_KEY");
     return new Response(
@@ -83,7 +100,7 @@ export async function POST(req: Request) {
       );
     }
 
-    logger.info("Processing vibe request:", { query });
+    logger.info(`Processing vibe request: ${query}`);
 
     const groq = new Groq({
       apiKey: process.env.GROQ_API_KEY,
@@ -134,7 +151,7 @@ export async function POST(req: Request) {
         headers: { "Content-Type": "application/json" },
       });
     } catch (e) {
-      logger.error("Invalid JSON response from Groq:", { content });
+      logger.error(`Invalid JSON response from Groq: ${content}`);
       return new Response(
         JSON.stringify({
           vibedQueries: [],
@@ -147,7 +164,7 @@ export async function POST(req: Request) {
       );
     }
   } catch (error) {
-    logger.error("API Error:", error);
+    logger.error(`API Error: ${error}`);
     return new Response(
       JSON.stringify({
         error: "An error occurred while processing your request",
