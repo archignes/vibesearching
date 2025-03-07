@@ -303,7 +303,7 @@ export const interestingQueries: interestingQuery[] = [
     ],
   },
   {
-    text: "Is Google Making us Stupid?",
+    text: "Is Google making us stupid?",
     sources: [
       {
         url: "https://www.pewresearch.org/internet/2010/02/19/part-1-a-review-of-responses-to-a-tension-pair-about-whether-google-will-make-people-stupid/",

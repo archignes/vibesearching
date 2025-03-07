@@ -66,7 +66,7 @@ export const InteractiveQueryItem: React.FC<InteractiveQueryItemProps> = ({
         <div className="flex space-x-1">
           <EngineButtons engines={engines} text={text} onSelect={onSelect} />
         </div>
-        <div className="flex space-x-2 relative z-10">
+        <div className="flex mr-1 space-x-1 relative z-10">
           {variant === "vibingaroundyou" ? (
             <Tooltip>
               <TooltipTrigger asChild>

@@ -55,7 +55,7 @@ export const DislikeMenu: React.FC<DislikeMenuProps> = ({
   };
 
   return (
-    <div className="relative">
+    <>
       <Tooltip>
         <TooltipTrigger asChild>
           <button
@@ -106,6 +106,6 @@ export const DislikeMenu: React.FC<DislikeMenuProps> = ({
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
